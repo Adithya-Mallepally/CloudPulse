@@ -1,0 +1,13 @@
+{
+  "name": "cloudpulse-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time microservices monitoring dashboard for CloudPulse",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'Build successful'"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}
