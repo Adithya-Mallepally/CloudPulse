@@ -1,0 +1,23 @@
+{
+  "name": "cloudpulse-metrics-service",
+  "version": "1.0.0",
+  "description": "Metrics collection and system telemetry microservice for CloudPulse",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "jest --runInBand --forceExit",
+    "lint": "eslint \"src/**/*.js\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.3.1",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  }
+}
