@@ -44,4 +44,11 @@ describe("Metrics Service API Suite", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.system).toBeDefined();
   });
+
+  test("GET /metrics/anomalies returns anomaly evaluation payload", async () => {
+    const res = await request(app).get("/metrics/anomalies");
+    expect(res.statusCode).toBe(200);
+    expect(res.body.hasAnomaly).toBeDefined();
+  });
 });
+

@@ -1,59 +1,62 @@
-# CloudPulse 📊
-### Containerised Microservices Monitoring Dashboard
-
-![Node.js](https://img.shields.io/badge/Node.js-20.x-green?style=flat-square&logo=node.js)
-![Docker](https://img.shields.io/badge/Docker-Compose-blue?style=flat-square&logo=docker)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
-![MongoDB](https://img.shields.io/badge/MongoDB-NoSQL-47A248?style=flat-square&logo=mongodb)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=flat-square&logo=github-actions)
+# CloudPulse
+### Containerised Microservices Monitoring & Predictive Anomaly Telemetry Dashboard
 
 ---
 
 ## Overview
 
-CloudPulse is a **containerised microservices application** with a live monitoring dashboard. It demonstrates real-world Cloud/DevOps practices including service decomposition, container orchestration with Docker Compose, automated CI/CD with GitHub Actions, and real-time observability via a React dashboard.
+CloudPulse is a production-oriented microservices monitoring platform and telemetry dashboard. It demonstrates real-world Cloud/DevOps practices including service decomposition, container orchestration with Docker Compose, automated CI/CD with GitHub Actions, real-time observability via a React dashboard, and predictive statistical anomaly detection.
 
-The system consists of three independent microservices — each containerised, independently deployable, and communicating over a shared Docker network.
+---
+
+## Unique Key Feature: Real-Time Telemetry Anomaly Detection
+
+Beyond basic static metric dashboards, CloudPulse includes an integrated statistical anomaly detection engine:
+- Moving Z-Score Telemetry Analysis: Continuously evaluates rolling CPU and memory distributions over configurable time windows.
+- Proactive Threshold Alerts: Identifies abnormal memory leak trajectories and unexpected CPU throttling before cluster failures occur.
+- Automated Remediation Recommendations: Output includes targeted DevOps actions (e.g., TRIGGER_AUTOSCALE_REPLICA, SCHEDULE_GRACEFUL_POD_RESTART).
+- Accessible via the `/metrics/anomalies` REST API endpoint and the interactive dashboard.
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Docker Network                        │
-│                                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  Auth Service│  │ Metrics Svc  │  │ Notif. Svc   │  │
-│  │  (Port 3001) │  │  (Port 3002) │  │  (Port 3003) │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  │
-│         │                 │                  │          │
-│         └─────────────────┼──────────────────┘          │
-│                           │                             │
-│                    ┌──────▼───────┐                     │
-│                    │   MongoDB    │                     │
-│                    │  (Port 27017)│                     │
-│                    └──────────────┘                     │
-└─────────────────────────────────────────────────────────┘
-           │
-    ┌──────▼───────┐
-    │ React Dashboard│
-    │  (Port 3000)  │
-    └───────────────┘
++---------------------------------------------------------+
+|                    Docker Network                       |
+|                                                         |
+|  +--------------+  +--------------+  +---------------+  |
+|  | Auth Service |  | Metrics Svc  |  |  Notif. Svc   |  |
+|  | (Port 3001)  |  | (Port 3002)  |  | (Port 3003)   |  |
+|  +-------+------+  +-------+------+  +-------+-------+  |
+|          |                 |                 |          |
+|          +-----------------+-----------------+          |
+|                            |                            |
+|                     +------v-------+                    |
+|                     |   MongoDB    |                    |
+|                     | (Port 27017) |                    |
+|                     +--------------+                    |
++---------------------------------------------------------+
+                           |
+                    +------v-------+
+                    |React Dashboard|
+                    | (Port 3000)  |
+                    +--------------+
 ```
 
 ---
 
 ## Features
 
-- ✅ Three independent microservices (Auth, Metrics, Notifications)
-- ✅ Real-time service health monitoring dashboard (React)
-- ✅ Container orchestration with Docker Compose
-- ✅ CI/CD pipeline with GitHub Actions (lint → test → build → push)
-- ✅ Centralised MongoDB with per-service collections
-- ✅ JWT-based inter-service authentication
-- ✅ Structured JSON logging across all services
-- ✅ Automatic container restart policies
+- Three independent microservices: Auth, Metrics, and Notifications
+- Statistical time-series anomaly detection engine (Z-score analysis)
+- Real-time service health monitoring dashboard built with React
+- Container orchestration with Docker Compose
+- CI/CD pipeline with GitHub Actions (lint, test, build, push)
+- Centralized MongoDB with per-service collections and offline resilient fallbacks
+- JWT-based inter-service authentication
+- Structured JSON logging across all microservices using Winston
+- Automatic container restart policies
 
 ---
 
@@ -62,11 +65,12 @@ The system consists of three independent microservices — each containerised, i
 | Component | Technology |
 |---|---|
 | Services | Node.js 20, Express |
-| Dashboard | React 18 |
-| Database | MongoDB |
+| Dashboard | React 18, Express static runner |
+| Database | MongoDB, Mongoose |
 | Containerisation | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
-| Auth | JWT |
+| Auth | JWT, bcryptjs |
+| Anomaly Detection | Statistical moving Z-score analyzer |
 | Logging | Winston |
 
 ---
@@ -80,33 +84,31 @@ CloudPulse/
 │   │   ├── src/
 │   │   │   ├── index.js          # Express entry point
 │   │   │   ├── routes/           # Auth routes (register, login, verify)
-│   │   │   ├── middleware/       # JWT middleware
+│   │   │   ├── middleware/       # JWT verification middleware
 │   │   │   └── models/           # Mongoose User model
+│   │   ├── test/                 # Jest & Supertest suites
 │   │   ├── Dockerfile
 │   │   └── package.json
 │   ├── metrics-service/
 │   │   ├── src/
 │   │   │   ├── index.js          # Express entry point
-│   │   │   ├── routes/           # Metrics collection & retrieval
-│   │   │   ├── collectors/       # CPU, memory, request stats collectors
+│   │   │   ├── routes/           # Metrics collection & anomalies endpoint
+│   │   │   ├── collectors/       # Host telemetry & anomaly detector
 │   │   │   └── models/           # Mongoose Metric model
+│   │   ├── test/                 # Telemetry & anomaly test suites
 │   │   ├── Dockerfile
 │   │   └── package.json
 │   └── notification-service/
 │       ├── src/
-│       │   ├── index.js          # Express entry point
-│       │   ├── routes/           # Alert creation & delivery
-│       │   └── models/           # Mongoose Notification model
+│       │   └── index.js          # Express entry point & alert routes
 │       ├── Dockerfile
 │       └── package.json
 ├── dashboard/
 │   ├── src/
-│   │   ├── App.jsx               # Root component
-│   │   ├── components/
-│   │   │   ├── ServiceCard.jsx   # Per-service health card
-│   │   │   ├── MetricsChart.jsx  # Real-time metrics chart
-│   │   │   └── AlertFeed.jsx     # Live notification feed
-│   │   └── api/                  # API client hooks
+│   │   ├── App.jsx               # Root dashboard component
+│   │   └── components/           # ServiceCard, MetricsChart, AlertFeed
+│   ├── public/                   # Production index.html
+│   ├── server.js                 # Static dashboard runner
 │   ├── Dockerfile
 │   └── package.json
 ├── .github/
@@ -120,11 +122,9 @@ CloudPulse/
 
 ## Getting Started
 
-### Run the Full Stack
+### Run with Docker Compose
 
 ```bash
-git clone https://github.com/Adithya-Mallepally/CloudPulse.git
-cd CloudPulse
 docker-compose up --build
 ```
 
@@ -135,31 +135,29 @@ docker-compose up --build
 | Metrics Service | http://localhost:3002 |
 | Notification Service | http://localhost:3003 |
 
+### Run Locally (Example: Metrics Service)
+
+```bash
+cd services/metrics-service
+npm install
+npm test
+npm start
+```
+
 ---
 
 ## CI/CD Pipeline
 
-The GitHub Actions pipeline runs on every push to `main`:
+The GitHub Actions pipeline runs on every push to main:
 
-```
-Push → Lint (ESLint) → Unit Tests → Build Docker Images → Push to GHCR
-```
+Lint (ESLint) -> Unit Tests (Jest) -> Build Docker Images -> Push to GHCR
 
-See `.github/workflows/ci-cd.yml` for the full configuration.
-
----
-
-## Future Work
-
-- [ ] Kubernetes deployment manifests (Helm charts)
-- [ ] Prometheus + Grafana integration
-- [ ] Distributed tracing with OpenTelemetry
-- [ ] Auto-scaling policies
+See `.github/workflows/ci-cd.yml` for configuration.
 
 ---
 
 ## Author
 
-**Roopadithya Vardhan Mallepally**
-M.Sc. Software Engineering — BTH Sweden
-[GitHub](https://github.com/Adithya-Mallepally) · [LinkedIn](https://linkedin.com/in/roopadithya)
+Roopadithya Vardhan Mallepally
+M.Sc. Software Engineering - BTH Sweden
+GitHub: https://github.com/Adithya-Mallepally

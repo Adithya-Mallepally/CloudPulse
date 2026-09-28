@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Metric = require("../models/metric.model");
 const { collectSystemMetrics } = require("../collectors/system.collector");
-
+const { detector } = require("../collectors/anomaly.detector");
 
 const router = express.Router();
 
@@ -10,6 +10,13 @@ router.get("/live", (req, res) => {
   const current = collectSystemMetrics();
   res.json(current);
 });
+
+router.get("/anomalies", (req, res) => {
+  const current = collectSystemMetrics();
+  const evaluation = detector.detectAnomalies(current);
+  res.json(evaluation);
+});
+
 
 router.post("/", async (req, res) => {
   try {
